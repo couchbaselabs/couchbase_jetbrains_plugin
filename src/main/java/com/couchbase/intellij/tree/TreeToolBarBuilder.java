@@ -1,6 +1,8 @@
 package com.couchbase.intellij.tree;
 
 import com.couchbase.intellij.database.ActiveCluster;
+import com.couchbase.intellij.eventing.FunctionDeploymentDialog;
+import com.couchbase.intellij.eventing.FunctionDeploymentSettings;
 import com.couchbase.intellij.tools.CBShell;
 import com.couchbase.intellij.tree.examples.CardDialog;
 import com.couchbase.intellij.workbench.Log;
@@ -36,7 +38,8 @@ public class TreeToolBarBuilder {
                         Project project = e.getProject();
                         workbenchCounter++;
                         String fileName = "workbench" + workbenchCounter + ".sqlpp";
-                        VirtualFile virtualFile = new LightVirtualFile(fileName, FileTypeManager.getInstance().getFileTypeByExtension("sqlpp"), "");
+                        VirtualFile virtualFile = new LightVirtualFile(fileName,
+                                FileTypeManager.getInstance().getFileTypeByExtension("sqlpp"), "");
                         // Open the file in the editor
                         FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
                         fileEditorManager.openFile(virtualFile, true);
@@ -48,7 +51,8 @@ public class TreeToolBarBuilder {
             }
         };
 
-        newWorkbench.getTemplatePresentation().setIcon(IconLoader.getIcon("/assets/icons/new_query.svg", CouchbaseWindowContent.class));
+        newWorkbench.getTemplatePresentation()
+                .setIcon(IconLoader.getIcon("/assets/icons/new_query.svg", CouchbaseWindowContent.class));
 
         AnAction addConnectionAction = new AnAction("Add New Connection") {
             @Override
@@ -58,7 +62,8 @@ public class TreeToolBarBuilder {
                 dialog.show();
             }
         };
-        addConnectionAction.getTemplatePresentation().setIcon(IconLoader.getIcon("/assets/icons/new_database.svg", CouchbaseWindowContent.class));
+        addConnectionAction.getTemplatePresentation()
+                .setIcon(IconLoader.getIcon("/assets/icons/new_database.svg", CouchbaseWindowContent.class));
 
         AnAction cbshellAction = new AnAction("Open New CB Shell") {
             @Override
@@ -67,11 +72,13 @@ public class TreeToolBarBuilder {
                 if (ActiveCluster.getInstance().get() != null) {
                     CBShell.openNewTerminal();
                 } else {
-                    Messages.showErrorDialog("You need to connecto to a cluster first before running CB Shell", "Couchbase Plugin Error");
+                    Messages.showErrorDialog("You need to connecto to a cluster first before running CB Shell",
+                            "Couchbase Plugin Error");
                 }
             }
         };
-        cbshellAction.getTemplatePresentation().setIcon(IconLoader.getIcon("/assets/icons/cbshell.svg", CouchbaseWindowContent.class));
+        cbshellAction.getTemplatePresentation()
+                .setIcon(IconLoader.getIcon("/assets/icons/cbshell.svg", CouchbaseWindowContent.class));
 
         AnAction ellipsisAction = new AnAction("More Options") {
             @Override
@@ -79,19 +86,34 @@ public class TreeToolBarBuilder {
                 // Open menu code here
                 JBPopupMenu menu = new JBPopupMenu();
                 JBMenuItem item1 = new JBMenuItem("New Project from Template");
+                JBMenuItem item2 = new JBMenuItem("Deploy Function");
+                JBMenuItem item3 = new JBMenuItem("Function Settings");
+
                 menu.add(item1);
+                menu.add(item2);
+                menu.add(item3);
 
                 item1.addActionListener(e1 -> {
                     CardDialog dialog = new CardDialog(project);
                     dialog.show();
                 });
 
+                item2.addActionListener(e2 -> {
+                    FunctionDeploymentDialog dialog = new FunctionDeploymentDialog(project);
+                    dialog.show();
+                });
+
+                item3.addActionListener(e3 -> {
+                    FunctionDeploymentSettings settings = new FunctionDeploymentSettings();
+                    settings.setVisible(true);
+                });
 
                 Component component = e.getInputEvent().getComponent();
                 menu.show(component, component.getWidth() / 2, component.getHeight() / 2);
             }
         };
-        ellipsisAction.getTemplatePresentation().setIcon(IconLoader.getIcon("/assets/icons/ellipsis_horizontal.svg", CouchbaseWindowContent.class));
+        ellipsisAction.getTemplatePresentation()
+                .setIcon(IconLoader.getIcon("/assets/icons/ellipsis_horizontal.svg", CouchbaseWindowContent.class));
         ellipsisAction.getTemplatePresentation().setDescription("More options");
 
         DefaultActionGroup leftActionGroup = new DefaultActionGroup();
@@ -100,19 +122,21 @@ public class TreeToolBarBuilder {
         leftActionGroup.add(newWorkbench);
         leftActionGroup.addSeparator();
 
-// Disabling CBSHELL for now
-//        if (OSUtil.isMacOS()) {
-//            leftActionGroup.add(cbshellAction);
-//        }
+        // Disabling CBSHELL for now
+        // if (OSUtil.isMacOS()) {
+        // leftActionGroup.add(cbshellAction);
+        // }
 
         DefaultActionGroup rightActionGroup = new DefaultActionGroup();
         rightActionGroup.add(ellipsisAction);
 
-        ActionToolbar leftActionToolbar = ActionManager.getInstance().createActionToolbar("Explorer", leftActionGroup, true);
+        ActionToolbar leftActionToolbar = ActionManager.getInstance().createActionToolbar("Explorer", leftActionGroup,
+                true);
         leftActionToolbar.setTargetComponent(toolBarPanel);
         toolBarPanel.add(leftActionToolbar.getComponent(), BorderLayout.WEST);
 
-        ActionToolbar rightActionToolbar = ActionManager.getInstance().createActionToolbar("MoreOptions", rightActionGroup, true);
+        ActionToolbar rightActionToolbar = ActionManager.getInstance().createActionToolbar("MoreOptions",
+                rightActionGroup, true);
         rightActionToolbar.setTargetComponent(toolBarPanel);
         toolBarPanel.add(rightActionToolbar.getComponent(), BorderLayout.EAST);
 
