@@ -31,7 +31,7 @@ import java.util.TreeMap;
 public class CouchbaseWindowContent extends JPanel {
 
     private static DefaultTreeModel treeModel;
-    private static Project project;
+    static Project project;
 
     private static JPanel toolBarPanel;
 
