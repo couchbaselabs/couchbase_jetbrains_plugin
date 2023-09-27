@@ -67,6 +67,7 @@ public class DependenciesDownloader {
         } else if (ALL_TOOLS.equals(toolKey)) {
             map.put(CBTools.Type.CBC_PILLOW_FIGHT, path + "cbc-pillowfight" + suffix);
             map.put(CBTools.Type.MCTIMINGS, path + "mctimings" + suffix);
+            map.put(CBTools.Type.CBSTATS, path + "cbstats" + suffix);
 
         } else {
             throw new IllegalStateException("Not implemented yet");
@@ -155,16 +156,24 @@ public class DependenciesDownloader {
 
         ToolSpec cbTools = downloads.get(ALL_TOOLS);
         String toolsDir = toolsPath + File.separator + cbTools.getInstallationPath();
-        if (CBTools.getTool(CBTools.Type.CBC_PILLOW_FIGHT).getStatus() == ToolStatus.NOT_AVAILABLE
-                && !isInstalled(toolsPath, downloads.get(ALL_TOOLS), CBTools.Type.CBC_PILLOW_FIGHT)) {
 
-            Log.info("Downloading CB tools. The feature will be automatically enabled when the download is complete.");
-            CBTools.getTool(CBTools.Type.CBC_PILLOW_FIGHT).setStatus(ToolStatus.DOWNLOADING);
-            CBTools.getTool(CBTools.Type.MCTIMINGS).setStatus(ToolStatus.DOWNLOADING);
+        CBTools.Type[] toolTypes = {CBTools.Type.CBC_PILLOW_FIGHT, CBTools.Type.MCTIMINGS, CBTools.Type.CBSTATS};
+
+        boolean shouldDownload = false;
+        for (CBTools.Type toolType : toolTypes) {
+            if (CBTools.getTool(toolType).getStatus() == ToolStatus.NOT_AVAILABLE
+                    && !isInstalled(toolsPath, downloads.get(ALL_TOOLS), toolType)) {
+                shouldDownload = true;
+                CBTools.getTool(toolType).setStatus(ToolStatus.DOWNLOADING);
+            } else {
+                Log.debug(toolType + " tool is already installed");
+                setToolActive(ToolStatus.AVAILABLE, toolsDir, cbTools);
+            }
+        }
+
+        if (shouldDownload) {
+            Log.info("Downloading tools. The features will be automatically enabled when the download is complete.");
             downloadAndUnzip(toolsDir, cbTools);
-        } else {
-            Log.debug("CB Tools are already installed");
-            setToolActive(ToolStatus.AVAILABLE, toolsDir, cbTools);
         }
 
     }

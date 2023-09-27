@@ -10,6 +10,7 @@ import com.couchbase.intellij.tools.CBExport;
 import com.couchbase.intellij.tools.CBImport;
 import com.couchbase.intellij.tools.CBTools;
 import com.couchbase.intellij.tools.PillowFightDialog;
+import com.couchbase.intellij.tools.dialog.CbstatsDialog;
 import com.couchbase.intellij.tools.dialog.DDLExportDialog;
 import com.couchbase.intellij.tools.dialog.ExportDialog;
 import com.couchbase.intellij.tools.dialog.ImportDialog;
@@ -436,6 +437,18 @@ public class TreeRightClickListener {
         };
         actionGroup.add(simpleExport);
 
+        actionGroup.addSeparator();
+
+        AnAction viewStats = new AnAction("View Scope Statistics") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                // You can replace the following line with your own implementation for viewing scope statistics.
+                CbstatsDialog cbstatsDialog = new CbstatsDialog(scope.getBucket(),scope.getText(),"","scope");
+                cbstatsDialog.show();
+            }
+        };
+        actionGroup.add(viewStats);
+
         showPopup(e, tree, actionGroup);
     }
 
@@ -665,6 +678,21 @@ public class TreeRightClickListener {
             };
             actionGroup.add(simpleExport);
         }
+
+        actionGroup.addSeparator();
+        AnAction viewStats = new AnAction("View Collection Statistics") {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                CbstatsDialog cbstatsDialog = new CbstatsDialog(
+                        col.getBucket(),
+                        col.getScope(),
+                        col.getText(),
+                        "collection"
+                );
+                cbstatsDialog.show();
+            }
+        };
+        actionGroup.add(viewStats);
 
         showPopup(e, tree, actionGroup);
     }

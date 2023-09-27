@@ -80,6 +80,67 @@ public class TemplateUtil {
         return finalPanel;
     }
 
+    public static JPanel createKeyValuePanelWithHelp(String[] keys, String[] values, String[] helpTexts, int cols) {
+        JPanel finalPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.gridy = 0;
+
+        int firstColumnRows = (int) Math.ceil((double) keys.length / cols);
+        int remainingColumnRows = keys.length % cols == 0 ? keys.length / cols : (keys.length / cols) + 1;
+
+        boolean isFirstColumnOdd = firstColumnRows % 2 != 0;
+
+        for (int i = 0; i < cols; i++) {
+            JPanel columnPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints columnGbc = new GridBagConstraints();
+            columnGbc.fill = GridBagConstraints.HORIZONTAL;
+            columnGbc.gridy = GridBagConstraints.RELATIVE;
+            columnGbc.anchor = GridBagConstraints.NORTHWEST;
+            columnGbc.insets = JBUI.insets(5, 5, 5, 15);
+            columnGbc.weightx = 0;
+
+            int columnRows = (i == 0 && cols % 2 != 0) ? firstColumnRows : remainingColumnRows;
+
+            for (int j = 0; j < columnRows; j++) {
+                int index = i * firstColumnRows + j - (i > 0 ? firstColumnRows - remainingColumnRows : 0);
+
+                if (index < keys.length) {
+                    JPanel keyPanelWithHelpIcon = getLabelWithHelp(keys[index], helpTexts[index]);
+                    columnPanel.add(keyPanelWithHelpIcon, columnGbc);
+
+                    columnGbc.gridx = 1;
+                    columnGbc.weightx = 1;
+                    columnGbc.fill = GridBagConstraints.HORIZONTAL;
+
+                    columnPanel.add(new JLabel(values[index]), columnGbc);
+
+                    columnGbc.gridx = 0;
+                    columnGbc.weightx = 0;
+                    columnGbc.fill = GridBagConstraints.HORIZONTAL;
+                } else if (isFirstColumnOdd && i > 0) {
+                    columnPanel.add(new JLabel("<html><strong>&nbsp;</strong></html>"), columnGbc);
+
+                    columnGbc.gridx = 1;
+                    columnGbc.weightx = 1;
+                    columnGbc.fill = GridBagConstraints.HORIZONTAL;
+
+                    columnPanel.add(new JLabel(""), columnGbc);
+
+                    columnGbc.gridx = 0;
+                    columnGbc.weightx = 0;
+                    columnGbc.fill = GridBagConstraints.HORIZONTAL;
+                }
+            }
+
+            gbc.weightx = 1.0 / cols;
+            finalPanel.add(columnPanel, gbc);
+        }
+
+        finalPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, finalPanel.getPreferredSize().height));
+        return finalPanel;
+    }
+
     public static TitledSeparator getSeparator(String title) {
         TitledSeparator titledSeparator = new TitledSeparator();
         titledSeparator.setText(title);
@@ -145,7 +206,6 @@ public class TemplateUtil {
             return String.format("%.2f Mb", sizeInMB);
         }
     }
-
 
     public static String fmtDouble(Double value) {
 

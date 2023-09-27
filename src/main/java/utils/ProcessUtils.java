@@ -24,4 +24,26 @@ public class ProcessUtils {
             }
         }
     }
+
+    public static String returnOutput(Process process) throws IOException {
+        StringBuilder output = new StringBuilder();
+
+        // Process standard output
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+        }
+
+        // Process standard error
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+        }
+
+        return output.toString();
+    }
 }
