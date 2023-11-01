@@ -92,24 +92,28 @@ public class TreeRightClickListener {
             actionGroup.add(clusterOverview);
             actionGroup.addSeparator();
 
-            if (!ActiveCluster.getInstance().isReadOnlyMode() && !ActiveCluster.getInstance().isCapella()) {
-                // Add "Create New Bucket" option
-                AnAction createNewBucketItem = new AnAction("Create New Bucket") {
-                    @Override
-                    public void actionPerformed(@NotNull AnActionEvent e) {
-                        try {
-                            new NewBucketCreationDialog(project).show((cancelled, err) -> {
-                                TreePath treePath = new TreePath(clickedNode.getPath());
-                                tree.collapsePath(treePath);
-                                tree.expandPath(treePath);
-                                tree.invalidate();
-                            });
-                        } catch (Exception ex) {
-                            Log.error("Bucket Creation failed ", ex);
+            if (!ActiveCluster.getInstance().isReadOnlyMode()) {
+                boolean isCapella = ActiveCluster.getInstance().isCapella();
+                boolean hasApiKey = ActiveCluster.getInstance().getApiKey() != null;
+                boolean hasApiSecret = ActiveCluster.getInstance().getApiSecret() != null;
+                if ((!isCapella || (hasApiKey && hasApiSecret))) {
+                    AnAction createNewBucketItem = new AnAction("Create New Bucket") {
+                        @Override
+                        public void actionPerformed(@NotNull AnActionEvent e) {
+                            try {
+                                new NewBucketCreationDialog(project).show((cancelled, err) -> {
+                                    TreePath treePath = new TreePath(clickedNode.getPath());
+                                    tree.collapsePath(treePath);
+                                    tree.expandPath(treePath);
+                                    tree.invalidate();
+                                });
+                            } catch (Exception ex) {
+                                Log.error("Bucket Creation failed ", ex);
+                            }
                         }
-                    }
-                };
-                actionGroup.add(createNewBucketItem);
+                    };
+                    actionGroup.add(createNewBucketItem);
+                }
             }
 
             AnAction refreshBuckets = new AnAction("Refresh Buckets") {

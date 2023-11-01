@@ -176,7 +176,7 @@ public class CouchbaseRestAPI {
 
     }
 
-    private static String callPostSingleEndpoint(String endpoint, String serverURL, String data) throws Exception {
+    public static String callPostSingleEndpoint(String endpoint, String serverURL, String data) throws Exception {
         List<String> servers = NSLookup.getServerURL(serverURL);
         return callEndpoint(false, endpoint, servers.get(0), data);
     }

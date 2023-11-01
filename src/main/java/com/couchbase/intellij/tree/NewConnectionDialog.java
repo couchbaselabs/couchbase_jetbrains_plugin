@@ -172,7 +172,7 @@ public class NewConnectionDialog extends DialogWrapper {
                     ConnectionNodeDescriptor userObject = (ConnectionNodeDescriptor) clickedNode.getUserObject();
                     TreeActionHandler.deleteConnection(clickedNode, userObject, tree);
                 }
-                SavedCluster sc = DataLoader.saveDatabaseCredentials(connectionNameTextField.getText(), getBaseUrl(hostTextField.getText()), getQueryParams(hostTextField.getText()), enableSSLCheckBox.isSelected(), usernameTextField.getText(), String.valueOf(passwordField.getPassword()), defaultBucketTextField.getText().trim().isEmpty() ? null : defaultBucketTextField.getText());
+                SavedCluster sc = DataLoader.saveDatabaseCredentials(connectionNameTextField.getText(), getBaseUrl(hostTextField.getText()), getQueryParams(hostTextField.getText()), enableSSLCheckBox.isSelected(), usernameTextField.getText(), String.valueOf(passwordField.getPassword()), defaultBucketTextField.getText().trim().isEmpty() ? null : defaultBucketTextField.getText(), apiKeyField.getText(), String.valueOf(apiSecretField.getPassword()));
                 messageLabel.setText("Connection was successful");
                 TreeActionHandler.connectToCluster(project, sc, tree, null);
                 close(DialogWrapper.CANCEL_EXIT_CODE);
@@ -548,7 +548,7 @@ public class NewConnectionDialog extends DialogWrapper {
 
 
         //TODO: Enable this when the new Capella Rest API is live
-        //tabbedPane.addTab("Management API Keys", managementAPIKeysPanel);
+        tabbedPane.addTab("Management API Keys", managementAPIKeysPanel);
         // Add "Connection Troubleshooting" tab
         thirdPanel = new JBPanel(new BorderLayout());
         thirdPanel.setBorder(JBUI.Borders.empty(10));

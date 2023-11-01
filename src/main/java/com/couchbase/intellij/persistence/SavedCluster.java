@@ -25,6 +25,9 @@ public class SavedCluster {
 
     private Long inferCachePeriod;
 
+    private String apiKey;
+    private String apiSecret;
+
     public String getId() {
         return id;
     }
@@ -180,5 +183,21 @@ public class SavedCluster {
 
     public void setReadOnly(Boolean readOnly) {
         this.readOnly = readOnly;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public String getApiSecret() {
+        return apiSecret;
+    }
+
+    public void setApiSecret(String apiSecret) {
+        this.apiSecret = apiSecret;
     }
 }

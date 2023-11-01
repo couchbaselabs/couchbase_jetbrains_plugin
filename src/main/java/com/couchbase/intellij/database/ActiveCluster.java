@@ -277,6 +277,14 @@ public class ActiveCluster implements CouchbaseClusterEntity {
         return null;
     }
 
+    public String getApiKey() {
+        return (savedCluster != null) ? savedCluster.getApiKey() : null;
+    }
+
+    public String getApiSecret() {
+        return (savedCluster != null) ? savedCluster.getApiSecret() : null;
+    }
+
     @Override
     public Stream<? extends CouchbaseClusterEntity> getChild(String name) {
         return getChildren().stream()

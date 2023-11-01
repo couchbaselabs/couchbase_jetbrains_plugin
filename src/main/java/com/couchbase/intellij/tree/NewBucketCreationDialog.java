@@ -2,6 +2,7 @@ package com.couchbase.intellij.tree;
 
 import com.couchbase.client.core.msg.kv.DurabilityLevel;
 import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.manager.bucket.*;
 import com.couchbase.client.protostellar.admin.bucket.v1.EvictionMode;
 import com.couchbase.intellij.database.ActiveCluster;
@@ -83,45 +84,77 @@ public class NewBucketCreationDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
-        Cluster cluster = ActiveCluster.getInstance().getCluster();
-        if (cluster == null) {
-            Messages.showMessageDialog("There is no active connection to run this query", "Couchbase Plugin Error", Messages.getErrorIcon());
-        }
+        if (ActiveCluster.getInstance().isCapella()) {
+            JsonObject payload = JsonObject.create()
+                    .put("name", this.bucketName.getText())
+                    .put("type", BucketType.valueOf(bucketTypes.getSelection().getActionCommand()).name().toLowerCase())
+                    .put("storageBackend", StorageBackend.of(storageBackends.getSelection().getActionCommand()).toString().toLowerCase())
+                    .put("memoryAllocationInMb", Long.valueOf(memQuota.getValue().toString()))
+                    .put("replicas", enableReplicas.isSelected() ? (Integer) replicaNum.getSelectedItem() : 1)
+                    .put("replicaIndexes", enableReplicas.isSelected() && replicateViewIndexes.isSelected())
+                    .put("flush", enableFlush.isSelected())
+                    .put("timeToLiveInSeconds", enableTTL.isSelected() ? Long.valueOf(bucketTTL.getText()) : 0)
+                    .put("bucketConflictResolution", ConflictResolutionType.valueOf(conflictResolutionType.getSelection().getActionCommand()).name().toLowerCase())
+                    .put("durabilityLevel", DurabilityLevel.valueOf(minimumDurabilityLevel.getSelectedItem().toString()).name().toLowerCase())
+                    .put("evictionPolicy", ejectionMethod.getSelection() != null ? EvictionPolicyType.valueOf(ejectionMethod.getSelection().getActionCommand()).name().toLowerCase() : "");
 
-        BucketSettings bs = BucketSettings.create(bucketName.getText());
-        bs.bucketType(BucketType.valueOf(bucketTypes.getSelection().getActionCommand()));
-        bs.storageBackend(StorageBackend.of(storageBackends.getSelection().getActionCommand()));
-        bs.ramQuotaMB(Long.valueOf(memQuota.getValue().toString()));
-        if (enableReplicas.isSelected()) {
-            bs.numReplicas((Integer) replicaNum.getSelectedItem());
-            if (replicateViewIndexes.isSelected()) {
-                bs.replicaIndexes(true);
+            try {
+                String response = CouchbaseRestAPI.callPostSingleEndpoint(
+                        "/v4/organizations/{organizationId}/projects/{projectId}/clusters/{clusterId}/buckets",
+                        ActiveCluster.getInstance().getClusterURL(), payload.toString());
+                Messages.showMessageDialog(response, "Bucket Creation Response", Messages.getInformationIcon());
+                if (listener != null) {
+                    listener.accept(false, null);
+                }
+            } catch (Exception e) {
+                Messages.showErrorDialog(e.getMessage(), "Failed to create bucket");
+                if (listener != null) {
+                    listener.accept(false, e);
+                }
+                return;
+            }
+        } else {
+            Cluster cluster = ActiveCluster.getInstance().getCluster();
+            if (cluster == null) {
+                Messages.showMessageDialog("There is no active connection to run this query", "Couchbase Plugin Error",
+                        Messages.getErrorIcon());
+            }
+
+            BucketSettings bs = BucketSettings.create(bucketName.getText());
+            bs.bucketType(BucketType.valueOf(bucketTypes.getSelection().getActionCommand()));
+            bs.storageBackend(StorageBackend.of(storageBackends.getSelection().getActionCommand()));
+            bs.ramQuotaMB(Long.valueOf(memQuota.getValue().toString()));
+            if (enableReplicas.isSelected()) {
+                bs.numReplicas((Integer) replicaNum.getSelectedItem());
+                if (replicateViewIndexes.isSelected()) {
+                    bs.replicaIndexes(true);
+                }
+            }
+            if (enableTTL.isSelected()) {
+                bs.maxExpiry(Duration.of(Long.valueOf(bucketTTL.getText()), ChronoUnit.SECONDS));
+            }
+            bs.compressionMode(CompressionMode.valueOf(compressionMode.getSelection().getActionCommand()));
+            bs.conflictResolutionType(
+                    ConflictResolutionType.valueOf(conflictResolutionType.getSelection().getActionCommand()));
+            if (ejectionMethod.getSelection() != null) {
+                bs.evictionPolicy(EvictionPolicyType.valueOf(ejectionMethod.getSelection().getActionCommand()));
+            }
+            bs.minimumDurabilityLevel(DurabilityLevel.values()[minimumDurabilityLevel.getSelectedIndex()]);
+            bs.flushEnabled(enableFlush.isSelected());
+
+            try {
+                cluster.buckets().createBucket(bs);
+                if (listener != null) {
+                    listener.accept(false, null);
+                }
+            } catch (Exception e) {
+                Messages.showErrorDialog(e.getMessage(), "Failed to create bucket");
+                if (listener != null) {
+                    listener.accept(false, e);
+                }
+                return;
             }
         }
-        if (enableTTL.isSelected()) {
-            bs.maxExpiry(Duration.of(Long.valueOf(bucketTTL.getText()), ChronoUnit.SECONDS));
-        }
-        bs.compressionMode(CompressionMode.valueOf(compressionMode.getSelection().getActionCommand()));
-        bs.conflictResolutionType(ConflictResolutionType.valueOf(conflictResolutionType.getSelection().getActionCommand()));
-        if (ejectionMethod.getSelection() != null) {
-            bs.evictionPolicy(EvictionPolicyType.valueOf(ejectionMethod.getSelection().getActionCommand()));
-        }
-        bs.minimumDurabilityLevel(DurabilityLevel.values()[minimumDurabilityLevel.getSelectedIndex()]);
-        bs.flushEnabled(enableFlush.isSelected());
-
-        try {
-            cluster.buckets().createBucket(bs);
-            if (listener != null) {
-                listener.accept(false, null);
-            }
-        } catch (Exception e) {
-            Messages.showErrorDialog(e.getMessage(), "Failed to create bucket");
-            if (listener != null) {
-                listener.accept(false, e);
-            }
-            return;
-        }
-
         super.doOKAction();
     }
 
