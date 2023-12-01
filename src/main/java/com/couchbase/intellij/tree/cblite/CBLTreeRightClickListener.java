@@ -3,6 +3,7 @@ package com.couchbase.intellij.tree.cblite;
 import com.couchbase.intellij.DocumentFormatter;
 import com.couchbase.intellij.tree.cblite.dialog.CBLAttachBlobDialog;
 import com.couchbase.intellij.tree.cblite.dialog.CBLCreateCollectionDialog;
+import com.couchbase.intellij.tree.cblite.dialog.CBLExportDialog;
 import com.couchbase.intellij.tree.cblite.dialog.CBLImportDialog;
 import com.couchbase.intellij.tree.cblite.nodes.*;
 import com.couchbase.intellij.tree.cblite.storage.CBLBlobHandler;
@@ -144,6 +145,14 @@ public class CBLTreeRightClickListener {
 
             DefaultActionGroup toolsAction = new DefaultActionGroup("Tools", true);
 
+            AnAction cblExport = new AnAction("Couchbase Lite Export") {
+                @Override
+                public void actionPerformed(@NotNull AnActionEvent e) {
+                    CBLExportDialog exportDialog = new CBLExportDialog(project,tree);
+                    exportDialog.show();
+                }
+            };
+            toolsAction.add(cblExport);
             AnAction cblImport = new AnAction("Couchbase Lite Import") {
                 @Override
                 public void actionPerformed(@NotNull AnActionEvent e) {
@@ -162,6 +171,7 @@ public class CBLTreeRightClickListener {
                 }
             };
             actionGroup.add(menuItem);
+
         }
 
         AnAction deleteConnection = new AnAction("Delete Connection") {

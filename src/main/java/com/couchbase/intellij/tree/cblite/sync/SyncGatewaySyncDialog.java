@@ -194,7 +194,7 @@ public class SyncGatewaySyncDialog extends DialogWrapper {
 
             scopeCombo.setItemListener(e -> {
 
-                colCombo.removeAllItems();
+                colCombo.removeAllItemsAndCreateNewComboBox();
                 if (e.isEmpty()) {
                     colCombo.setHint("");
                     colCombo.setEnabled(false);

@@ -110,7 +110,7 @@ public class JComboCheckBox extends JComboBox {
         setBorder(BorderFactory.createCompoundBorder(JBUI.Borders.empty(3), BorderFactory.createCompoundBorder(new RoundedLineBorder(borderColor, 1, 5, true), BorderFactory.createEmptyBorder(2, -1, 2, 5))));
     }
 
-    public void removeAllItems() {
+    public void removeAllItemsAndCreateNewComboBox() {
         JComboCheckBox newComboBox = new JComboCheckBox();
         newComboBox.setItemListener(listener);
         setModel(newComboBox.getModel());

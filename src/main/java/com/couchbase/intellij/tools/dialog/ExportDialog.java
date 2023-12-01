@@ -115,12 +115,12 @@ public class ExportDialog extends DialogWrapper {
             list.add(ALL_SCOPES);
             list.addAll(scopes);
 
-            scopeCombo.removeAllItems();
+            scopeCombo.removeAllItemsAndCreateNewComboBox();
             scopeCombo.setHint("Select one or more items");
             scopeCombo.setEnabled(true);
             list.forEach(item -> scopeCombo.addItem(item));
 
-            colCombo.removeAllItems();
+            colCombo.removeAllItemsAndCreateNewComboBox();
             colCombo.setEnabled(false);
         });
         bucketCombo.setSelectedItem(null);
@@ -138,7 +138,7 @@ public class ExportDialog extends DialogWrapper {
         scopeCombo = new JComboCheckBox();
         scopeCombo.setEnabled(false);
         scopeCombo.setItemListener(e -> {
-            colCombo.removeAllItems();
+            colCombo.removeAllItemsAndCreateNewComboBox();
 
             List<String> all = new ArrayList<>();
             List<String> partial = new ArrayList<>();

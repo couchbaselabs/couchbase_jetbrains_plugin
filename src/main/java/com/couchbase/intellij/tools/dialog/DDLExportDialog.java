@@ -93,7 +93,7 @@ public class DDLExportDialog extends DialogWrapper {
             list.add(ALL_SCOPES);
             list.addAll(scopes);
 
-            scopeCombo.removeAllItems();
+            scopeCombo.removeAllItemsAndCreateNewComboBox();
             scopeCombo.setHint("Select one or more items");
             scopeCombo.setEnabled(true);
             list.forEach(item -> scopeCombo.addItem(item));
