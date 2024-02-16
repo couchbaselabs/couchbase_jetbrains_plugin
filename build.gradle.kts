@@ -25,6 +25,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     compileOnly("org.projectlombok:lombok:1.18.30")
     implementation("com.couchbase.client:java-client:3.4.11")
+    implementation("org.apache.pdfbox:pdfbox:2.0.17")
     implementation("org.slf4j:slf4j-simple:2.0.7")
     implementation("org.eclipse.jgit:org.eclipse.jgit:6.5.0.202303070854-r")
     implementation("com.google.code.gson:gson:2.10.1")
