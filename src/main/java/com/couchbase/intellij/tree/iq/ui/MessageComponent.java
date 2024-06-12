@@ -49,7 +49,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MessageComponent extends JBPanel<MessageComponent> implements ChatPanel.ChatAwareMessageComponent {
 
-    private static final String feedbackEndpoint = "https://nms548yy5b.execute-api.us-west-1.amazonaws.com/Prod/";
+    public static final String FEEDBACK_ENDPOINT = "https://nms548yy5b.execute-api.us-west-1.amazonaws.com/Prod/";
+    public static final String SECRET ="c0uchbase_is_aw3some";
     private static final Logger LOG = Logger.getInstance(MessageComponent.class);
 
     private final MessagePanel component;
@@ -389,8 +390,10 @@ public class MessageComponent extends JBPanel<MessageComponent> implements ChatP
             return;
         }
         try {
-            HttpRequest request = HttpRequest.newBuilder(new URI(feedbackEndpoint))
-                    .header("X-Secret", "c0uchbase_is_aw3some")
+            logObject.put("type", "iq_feedback");
+
+            HttpRequest request = HttpRequest.newBuilder(new URI(FEEDBACK_ENDPOINT))
+                    .header("X-Secret", SECRET)
                     .POST(HttpRequest.BodyPublishers.ofByteArray(logObject.toBytes()))
                     .build();
 

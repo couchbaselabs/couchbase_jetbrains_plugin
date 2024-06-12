@@ -163,6 +163,13 @@
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
 
+        <action id="CouchbasePlugin.CompletionFeedback"
+                class="com.couchbase.intellij.actions.CompletionFeedbackAction"
+                text="Query Editor Feedback..."
+                description="Send feedback for Couchbase query editor">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+
         <action id="PillowFightAction"
                 class="com.couchbase.intellij.actions.PillowFightAction"
                 text="Couchbase Pillow Fight"
